@@ -23,19 +23,26 @@ def create_spark_session():
 
 def process_song_data(spark, input_data, output_data):
     # get filepath to song data file
-    song_data = 
+    song_data = input_data + "song_data/*/*/*"
     
     # read song data file
     df = 
+    df.createOrReplaceTempView('songs')
 
     # extract columns to create songs table
-    songs_table = 
+    songs_table = spark.sql("""
+                            SELECT DISTINCT song_id, title, artist_id, year, duration
+                            FROM songs
+                 """)
     
     # write songs table to parquet files partitioned by year and artist
     songs_table
 
     # extract columns to create artists table
-    artists_table = 
+    artists_table = spark.sql("""
+                              SELECT DISTINCT artist_id, artist_name, artist_location, artist_latitude, artist_longitude
+                              FROM songs
+                 """)
     
     # write artists table to parquet files
     artists_table
@@ -43,19 +50,23 @@ def process_song_data(spark, input_data, output_data):
 
 def process_log_data(spark, input_data, output_data):
     # get filepath to log data file
-    log_data =
+    log_data = input_data + "log_data/*/*"
 
     # read log data file
     df = 
     
     # filter by actions for song plays
     df = 
-
+    df.createOrReplaceTempView('logs')
+    
     # extract columns for users table    
-    artists_table = 
+    users_table = spark.sql("""
+                            SELECT DISTINCT userId, firstName, lastName, gender, level
+                            FROM logs
+               """)
     
     # write users table to parquet files
-    artists_table
+    users_table
 
     # create timestamp column from original timestamp column
     get_timestamp = udf()
