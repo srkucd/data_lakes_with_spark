@@ -57,25 +57,40 @@ def process_log_data(spark, input_data, output_data):
     df = 
     
     # filter by actions for song plays
-    df = 
+    df.createOrReplaceTempView('logs')
+    sql = """SELECT * FROM logs
+         WHERE page = 'NextSong'
+    """
+    df = spark.sql(sql)
     df.createOrReplaceTempView('logs')
     
-    # extract columns for users table    
-    users_table = spark.sql("""
-                            SELECT DISTINCT userId, firstName, lastName, gender, level
-                            FROM logs
-               """)
+    # extract columns for users table
+    sql = """SELECT DISTINCT userId, firstName, lastName, gender, level
+             FROM logs
+    """
+    users_table = spark.sql(sql)
     
     # write users table to parquet files
     users_table
-
-    # create timestamp column from original timestamp column
-    spark.udf.register('get_timestamp', lambda x: datetime.fromtimestamp(x/1000), TimestampType())
-    df = 
     
-    # create datetime column from original timestamp column
+    #udf definition
+    spark.udf.register('get_timestamp', lambda x: datetime.fromtimestamp(x/1000), TimestampType())
     spark.udf.register('get_datetime', lambda x: datetime.fromtimestamp(x/1000), DateType())
-    df = 
+    
+    # create timestamp column from original timestamp column. But this piece of code won't be used, it just shows I can finish the task,
+    #I prefer to use one table extract by SQL.
+    
+    #sql = """SELECT artist, auth, firstName, gender, itemInSession, lastName, length, level, location, method, page, registration, sessionId, song, status, userAgent, userId, get_timestamp(ts) AS timestamp
+    #    FROM logs
+    #    """
+    #df = spark.sql(sql)
+    
+    # create datetime column from original timestamp column. This one will work in this applet.
+    sql = """SELECT artist, auth, firstName, gender, itemInSession, lastName, length, level, location, method, page, registration, sessionId, song, status, userAgent, userId, get_timestamp(ts) AS timestamp, get_datetime(ts) AS datetime
+        FROM logs
+        """
+    df = spark.sql(sql)
+    df.createOrReplaceTempView('logs')
     
     # extract columns to create time table
     time_table = 
