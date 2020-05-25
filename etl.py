@@ -73,17 +73,13 @@ def process_log_data(spark, input_data, output_data):
     # write users table to parquet files
     users_table
     
-    #udf definition
-    spark.udf.register('get_timestamp', lambda x: datetime.fromtimestamp(x/1000), TimestampType())
-    spark.udf.register('get_datetime', lambda x: datetime.fromtimestamp(x/1000), DateType())
-    
     # create timestamp column from original timestamp column
-    get_timestamp = udf()
-    df = 
+    get_timestamp = udf(lambda x:datetime.fromtimestamp(x/1000), TimestampType())
+    df = df.withColumn('timestamp', get_timestamp('ts'))
     
     # create datetime column from original timestamp column
-    get_datetime = udf()
-    df = 
+    get_datetime = udf(lambda x:datetime.fromtimestamp(x/1000), DateType())
+    df = df.withColumn('datetime', get_datetime('ts'))
     
     # extract columns to create time table
     time_table = 
