@@ -77,20 +77,13 @@ def process_log_data(spark, input_data, output_data):
     spark.udf.register('get_timestamp', lambda x: datetime.fromtimestamp(x/1000), TimestampType())
     spark.udf.register('get_datetime', lambda x: datetime.fromtimestamp(x/1000), DateType())
     
-    # create timestamp column from original timestamp column. But this piece of code won't be used, it just shows I can finish the task,
-    #I prefer to use one table extract by SQL.
+    # create timestamp column from original timestamp column
+    get_timestamp = udf()
+    df = 
     
-    #sql = """SELECT artist, auth, firstName, gender, itemInSession, lastName, length, level, location, method, page, registration, sessionId, song, status, userAgent, userId, get_timestamp(ts) AS timestamp
-    #    FROM logs
-    #    """
-    #df = spark.sql(sql)
-    
-    # create datetime column from original timestamp column. This one will work in this applet.
-    sql = """SELECT artist, auth, firstName, gender, itemInSession, lastName, length, level, location, method, page, registration, sessionId, song, status, userAgent, userId, get_timestamp(ts) AS timestamp, get_datetime(ts) AS datetime
-        FROM logs
-        """
-    df = spark.sql(sql)
-    df.createOrReplaceTempView('logs')
+    # create datetime column from original timestamp column
+    get_datetime = udf()
+    df = 
     
     # extract columns to create time table
     time_table = 
