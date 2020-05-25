@@ -82,7 +82,16 @@ def process_log_data(spark, input_data, output_data):
     df = df.withColumn('datetime', get_datetime('ts'))
     
     # extract columns to create time table
-    time_table = 
+    sql = """SELECT get_timestamp(ts) AS start_time,
+                    DATE_TRUNC('hour', timestamp) AS hour,
+                    DATE_TRUNC('day', timestamp) AS days,
+                    DATE_TRUNC('week',timestamp) AS week,
+                    DATE_TRUNC('month', timestamp) AS month,
+                    DATE_TRUNC('year', timestamp) AS year,
+                    DAYOFWEEK(timestamp) AS weekday
+            FROM logs
+          """
+    time_table = spark.sql(sql)
     
     # write time table to parquet files partitioned by year and month
     time_table
