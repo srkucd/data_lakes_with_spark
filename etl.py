@@ -74,12 +74,14 @@ def process_log_data(spark, input_data, output_data):
     users_table
     
     # create timestamp column from original timestamp column
-    get_timestamp = udf(lambda x:datetime.fromtimestamp(x/1000), TimestampType())
+    get_timestamp = udf(lambda x:datetime.fromtimestamp(x/1000), TimestampType())#for dataframe(add one more column)
     df = df.withColumn('timestamp', get_timestamp('ts'))
+    spark.udf.register('get_timestamp', lambda x: datetime.fromtimestamp(x/1000), TimestampType())#for SparkSQL(extract columns to create time table)
     
     # create datetime column from original timestamp column
-    get_datetime = udf(lambda x:datetime.fromtimestamp(x/1000), DateType())
+    get_datetime = udf(lambda x:datetime.fromtimestamp(x/1000), DateType())#for dataframe(add one more column)
     df = df.withColumn('datetime', get_datetime('ts'))
+    spark.udf.register('get_datetime', lambda x: datetime.fromtimestamp(x/1000), DateType())#for SparkSQL(extract columns to create time table)
     
     # extract columns to create time table
     sql = """SELECT get_timestamp(ts) AS start_time,
