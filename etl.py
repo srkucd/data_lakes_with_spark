@@ -5,6 +5,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.types import TimestampType, DateType
 from pyspark.sql.functions import udf, col
 from pyspark.sql.functions import year, month, dayofmonth, hour, weekofyear, date_format
+from pyspark.sql import functions as F
 
 
 config = configparser.ConfigParser()
@@ -99,10 +100,23 @@ def process_log_data(spark, input_data, output_data):
     time_table
 
     # read in song data to use for songplays table
-    song_df = 
+    song_df = spark.read.parquet(#where I store songs.parquet)
+    song_df.createOrReplaceTempView('songs')
 
-    # extract columns from joined song and log datasets to create songplays table 
-    songplays_table = 
+    # extract columns from joined song and log datasets to create songplays table
+    sql = """SELECT timestamp AS start_time,
+                userId AS user_id,
+                level,
+                song_id,
+                artist_id,
+                sessionId AS session_id,
+                location,
+                userAgent
+         FROM logs 
+         JOIN song ON song.title = logs.song
+         """
+    songplays_table = spark.sql(sql)
+    songplays_table.withColumn('songplay_id', F.monotonically_increasing_id())
 
     # write songplays table to parquet files partitioned by year and month
     songplays_table
