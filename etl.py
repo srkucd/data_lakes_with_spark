@@ -102,6 +102,8 @@ def process_log_data(spark, input_data, output_data):
     df = df.withColumn('datetime', get_datetime('ts'))
     spark.udf.register('get_datetime', lambda x: datetime.fromtimestamp(x/1000), DateType())#for SparkSQL(extract columns to create time table)
     
+    df.createOrReplaceTempView('logs')
+    
     # extract columns to create time table
     sql = """SELECT get_timestamp(ts) AS start_time,
                     DATE_TRUNC('hour', timestamp) AS hour,
@@ -122,16 +124,18 @@ def process_log_data(spark, input_data, output_data):
     song_df.createOrReplaceTempView('songs')
 
     # extract columns from joined song and log datasets to create songplays table
-    sql = """SELECT timestamp AS start_time,
+    sql = """SELECT ts AS start_time,
                 userId AS user_id,
                 level,
                 song_id,
                 artist_id,
                 sessionId AS session_id,
                 location,
-                userAgent
+                userAgent,
+                DATE_TRUNC('month',timestamp) AS month,
+                DATE_TRUNC('year',timestamp) AS year
          FROM logs 
-         JOIN song ON song.title = logs.song
+         JOIN songs ON songs.title = logs.song
          """
     songplays_table = spark.sql(sql)
     songplays_table.withColumn('songplay_id', F.monotonically_increasing_id())
